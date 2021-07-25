@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application): AndroidViewModel(application) {
     private val repository: AppRepository = AppRepository(application)
-    val priceController = PriceController()
+    private val priceController = PriceController()
 
     val prizes: LiveData<List<Prize>> = repository.getPrizes()
 
@@ -26,7 +26,7 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     private var _totalAmount = MutableLiveData(0)
     val totalAmount get() = _totalAmount
 
-    fun setTotalAmount(price: Int) {
+    private fun setTotalAmount(price: Int) {
         _totalAmount.value = price
     }
 

@@ -15,7 +15,6 @@ import com.example.prizes.callbacks.SwipeToDeleteCallback
 import com.example.prizes.data.entities.Prize
 import com.example.prizes.databinding.FragmentPrizeListBinding
 import com.example.prizes.view_models.MainViewModel
-import java.lang.Exception
 
 class PrizeListFragment : Fragment(), OnItemCheckListener {
 
@@ -65,11 +64,9 @@ class PrizeListFragment : Fragment(), OnItemCheckListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         viewModel.totalAmount.observe(viewLifecycleOwner,  {
             binding.amountPrice.text = it.toString()
         })
-
     }
 
     override fun onDestroyView() {
@@ -80,18 +77,16 @@ class PrizeListFragment : Fragment(), OnItemCheckListener {
     override fun onItemCheck(item: Prize, position: Int) {
         with (viewModel) {
             onItemCheckCallback(item, position)
-//            try {
-                val positions = checkSelection()
+            val positions = checkSelection()
                 if (positions.isNotEmpty())
                     for (pair in positions) {
                         val holder = recyclerView.findViewHolderForAdapterPosition(pair.first)
                                 as RecyclerViewAdapter.ViewHolder?
                         holder?.let {
-                            adapter.unCheckItem(it)
+                            adapter.performCheckBoxClick(it, pair.first)
                             onItemUncheckCallback(pair.second, pair.first)
                         }
                     }
-//            } catch (err: Exception) {}
         }
     }
 

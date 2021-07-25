@@ -1,6 +1,5 @@
 package com.example.prizes.utils
 
-import android.util.Log
 import com.example.prizes.data.entities.Prize
 
 class PriceController {
@@ -27,12 +26,22 @@ class PriceController {
 
         while (amount > TARGET && selectedItemsPrice.size > 0) {
             val target = amount - TARGET
-            val price = findClosest(selectedItemsPrice.dropLast(1), target)
-            val prize = selectedItemsPrice.find{ it.price == price } as Prize
-            val index = selectedItemsPrice.indexOf(prize)
-            val position = selectedItemsIndex[index]
+            var price = selectedItemsPrice[selectedItemsPrice.size - 1].price.toString().toInt()
+            var prize: Prize
+            var position: Int
+            var index: Int
 
-            Log.i("data", "$price $index")
+            if ( price > TARGET) {
+                index = selectedItemsPrice.size - 1
+                prize = selectedItemsPrice[index]
+                position = selectedItemsIndex[index]
+            } else {
+                price = findClosest(selectedItemsPrice.dropLast(1), target)
+                prize = selectedItemsPrice.find { it.price == price } as Prize
+                index = selectedItemsPrice.indexOf(prize)
+                position = selectedItemsIndex[index]
+            }
+
             positions.add(Pair(position, prize))
             removeItem(position, prize)
 
