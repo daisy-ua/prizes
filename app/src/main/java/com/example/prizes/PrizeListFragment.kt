@@ -1,24 +1,23 @@
 package com.example.prizes
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.prizes.adapters.RecyclerViewAdapter
+import com.example.prizes.callbacks.OnItemCheckListener
 import com.example.prizes.callbacks.SwipeToDeleteCallback
 import com.example.prizes.data.entities.Prize
 import com.example.prizes.databinding.FragmentPrizeListBinding
 import com.example.prizes.view_models.MainViewModel
+import java.lang.Exception
 
-class PrizeListFragment : Fragment() {
+class PrizeListFragment : Fragment(), OnItemCheckListener {
 
     private var _binding: FragmentPrizeListBinding? = null
     private val binding get() = _binding!!
@@ -35,7 +34,9 @@ class PrizeListFragment : Fragment() {
 
         viewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
 
-        adapter = RecyclerViewAdapter(viewModel)
+        adapter = RecyclerViewAdapter(viewModel).also {
+            it.setOnClickListener(this)
+        }
 
 
         recyclerView = binding.mainRecyclerView
@@ -65,9 +66,10 @@ class PrizeListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        view.findViewById<Button>(R.id.button_first).setOnClickListener {
-//            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-//        }
+        viewModel.totalAmount.observe(viewLifecycleOwner,  {
+            binding.amountPrice.text = it.toString()
+        })
+
     }
 
     override fun onDestroyView() {
@@ -75,4 +77,25 @@ class PrizeListFragment : Fragment() {
         _binding = null
     }
 
+    override fun onItemCheck(item: Prize, position: Int) {
+        with (viewModel) {
+            onItemCheckCallback(item, position)
+//            try {
+                val positions = checkSelection()
+                if (positions.isNotEmpty())
+                    for (pair in positions) {
+                        val holder = recyclerView.findViewHolderForAdapterPosition(pair.first)
+                                as RecyclerViewAdapter.ViewHolder?
+                        holder?.let {
+                            adapter.unCheckItem(it)
+                            onItemUncheckCallback(pair.second, pair.first)
+                        }
+                    }
+//            } catch (err: Exception) {}
+        }
+    }
+
+    override fun onItemUncheck(item: Prize, position: Int) {
+        viewModel.onItemUncheckCallback(item, position)
+    }
 }

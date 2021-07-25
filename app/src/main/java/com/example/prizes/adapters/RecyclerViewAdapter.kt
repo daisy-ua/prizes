@@ -3,16 +3,18 @@ package com.example.prizes.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.prizes.callbacks.OnItemCheckListener
 import com.example.prizes.data.entities.Prize
 import com.example.prizes.databinding.ContainerPrizeListItemBinding
 import com.example.prizes.view_models.MainViewModel
 
-class RecyclerViewAdapter(private val viewModel: MainViewModel) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>(){
+class RecyclerViewAdapter(private val viewModel: MainViewModel)
+    : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
     private var data: List<Prize>? = null
+    private lateinit var onClickCallback: OnItemCheckListener
 
-     class ViewHolder(private val binding: ContainerPrizeListItemBinding)
+     class ViewHolder(val binding: ContainerPrizeListItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
-
             fun bind(item: Prize) {
                 binding.apply {
                     itemName.text = item.title
@@ -29,7 +31,17 @@ class RecyclerViewAdapter(private val viewModel: MainViewModel) : RecyclerView.A
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         data?.let {
-            holder.bind(it[position])
+            val item = it[position]
+            holder.bind(item)
+
+            holder.itemView.setOnClickListener{
+                with(holder.binding) {
+                    if (itemCheckBox.isChecked)
+                        onClickCallback.onItemUncheck(item, position)
+                    else onClickCallback.onItemCheck(item, position)
+                    itemCheckBox.performClick()
+                }
+            }
         }
     }
 
@@ -42,10 +54,18 @@ class RecyclerViewAdapter(private val viewModel: MainViewModel) : RecyclerView.A
         notifyDataSetChanged()
     }
 
-    fun deleteItemAtPosition(position: Int) {
+    fun deleteItemAtPosition(position: Int) { //TODO: move viewmodel
         data?.get(position)?.also {
             viewModel.deletePrize(it)
             notifyItemRemoved(position)
         }
+    }
+
+    fun unCheckItem(holder: ViewHolder) {
+        holder.binding.itemCheckBox.performClick()
+    }
+
+    fun setOnClickListener(listener: OnItemCheckListener) {
+        onClickCallback = listener
     }
 }
