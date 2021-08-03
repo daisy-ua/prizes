@@ -14,6 +14,14 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
 
     val prizes: LiveData<List<Prize>> = repository.getPrizes()
 
+    private val _insertedItem = MutableLiveData<Pair<String, Int>>()
+    val insertedItem: LiveData<Pair<String, Int>> get() = _insertedItem
+
+    fun insertItem(pair: Pair<String, Int>) {
+        _insertedItem.value = pair
+    }
+
+
     fun deletePrize(prize: Prize) = viewModelScope.launch(Dispatchers.IO) {
         repository.deletePrize(prize)
     }

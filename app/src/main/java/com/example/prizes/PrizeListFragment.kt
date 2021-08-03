@@ -59,6 +59,14 @@ class PrizeListFragment : Fragment(), OnItemCheckListener {
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
+        viewModel.insertedItem.observe(viewLifecycleOwner, {
+            viewModel.insertPrize(it.first, it.second)
+            with(recyclerView.adapter as RecyclerViewAdapter) {
+                addState()
+                notifyItemInserted(itemCount)
+            }
+        })
+
         return binding.root
     }
 

@@ -7,6 +7,7 @@ import com.example.prizes.callbacks.OnItemCheckListener
 import com.example.prizes.data.entities.Prize
 import com.example.prizes.databinding.ContainerPrizeListItemBinding
 import com.example.prizes.view_models.MainViewModel
+import java.lang.Exception
 
 class RecyclerViewAdapter(private val viewModel: MainViewModel)
     : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
@@ -21,7 +22,9 @@ class RecyclerViewAdapter(private val viewModel: MainViewModel)
             binding.apply {
                 itemName.text = item.title
                 itemPrice.text = item.price.toString()
-                itemCheckBox.isChecked = states[position]
+                itemCheckBox.isChecked = try { states[position] } catch (err: Exception) {
+                    false
+                }
             }
         }
     }
@@ -29,12 +32,16 @@ class RecyclerViewAdapter(private val viewModel: MainViewModel)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ContainerPrizeListItemBinding.inflate(layoutInflater, parent, false)
-        return ViewHolder(binding).also { states.add(false) }
+        return ViewHolder(binding).also {
+            states.add(false)
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         data?.let {
             val item = it[position]
+            if (itemCount < states.size)
+                states = states.dropLast(states.size - itemCount).toMutableList()
 
             holder.bind(item, position)
 
@@ -65,11 +72,12 @@ class RecyclerViewAdapter(private val viewModel: MainViewModel)
 
             states.removeAt(position)
             viewModel.deletePrize(it)
-
             notifyItemRemoved(position)
 //            notifyItemRangeChanged(position, data!!.size)
         }
     }
+
+    fun addState() = states.add(false)
 
     fun performCheckBoxClick(holder: ViewHolder, position: Int) {
         states[position] = !states[position]

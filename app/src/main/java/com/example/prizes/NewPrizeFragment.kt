@@ -1,17 +1,13 @@
 package com.example.prizes
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Button
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.example.prizes.databinding.FragmentNewPrizeBinding
-import com.example.prizes.databinding.FragmentPrizeListBinding
 import com.example.prizes.view_models.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 
@@ -69,7 +65,7 @@ class NewPrizeFragment : DialogFragment() {
                     Snackbar.make(binding.root, "Fill all fields", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show()
                 else {
-                    viewModel.insertPrize(title, price.toInt())
+                    viewModel.insertItem(Pair(title, price.toInt()))
                     dismiss()
                 }
             }
